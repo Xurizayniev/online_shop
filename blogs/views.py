@@ -1,3 +1,30 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render, redirect
+from django.urls import reverse
+from django.views.generic import ListView, DetailView, CreateView
+from blogs.models import PostModel
+from .forms import CommentModelForm
 
-# Create your views here.
+class PostListView(ListView):
+    template_name = 'blog.html'
+
+    def get_queryset(self):
+        qs = PostModel.objects.order_by('-id')
+        tag = self.request.GET.get('tag')
+        if tag:
+            qs = qs.filter(tag__name=tag)
+        return qs
+
+
+class PostDetailView(DetailView):
+    model = PostModel
+    template_name = 'blog-detail.html'
+
+class CommentCreatView(CreateView):
+    form_class = CommentModelForm
+
+    def form_valid(self, form):
+        form.instance.post = get_object_or_404(PostModel, pk=self.kwargs.get('pk'))
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('blogs:detail', kwargs={'pk':self.kwargs.get('pk')})

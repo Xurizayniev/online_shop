@@ -1,0 +1,35 @@
+{% load static %}
+
+<div class="product__item sale">
+    <div class="product__item__pic set-bg" data-setbg="{{ product.main_image.url }}">
+    
+        <span class="label">Sale</span>
+        
+        {% if product.new %}
+            <span class="label new  {% if product.is_discount %} new_mt {% endif %}" >New</span>
+        {% endif %}
+        <ul class="product__hover">
+            <li><a href="#"><img src="{% static 'img/icon/heart.png' %}" alt=""></a></li>
+            <li><a href="{% url 'shop:detail' pk=product.pk %}"><img src="{% static 'img/icon/search.png' %}" alt=""></a></li>
+        </ul>
+    </div>
+    <div class="product__item__text">
+        <h6>{{ product.title }}</h6>
+        <a href="#" class="add-cart">+ Add To Cart</a>
+        <div class="rating">
+            <i class="fa fa-star"></i>
+            <i class="fa fa-star"></i>
+            <i class="fa fa-star"></i>
+            <i class="fa fa-star"></i>
+            <i class="fa fa-star-o"></i>
+        </div>
+        <h5>${{ product.get_price }} {% if product.is_discount %} <del class="text-secondary">{{ product.price }}</del> {% endif %}</h5>
+        <div class="product__color__select">
+            {% for color in product.colors.all %}
+            <label for="{{ color.code }}">
+                <input type="radio" id="{{ color.code }}">
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+</div>

@@ -1,0 +1,137 @@
+{% load static %}
+
+<div class="shop__sidebar">
+                       <div class="shop__sidebar__search">
+                            <form action="{% url 'shop:home' %}", method="GET">
+                                <input name="search" value="{{ request.GET.search }}" type="text" placeholder="Search...">
+                                <button type="submit"><span class="icon_search"></span></button>
+                            </form>
+                        </div>
+                        <div class="shop__sidebar__accordion">
+                            <div class="accordion" id="accordionExample">
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseOne">Categories</a>
+                                    </div>
+                                    <div id="collapseOne" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__categories">
+                                                <ul class="nice-scroll">
+                                                    {% for cat in categories %}
+                                                    <li><a onclick="addUrlParameter('cat', {{ cat.pk }})" style="cursor: pointer;" 
+                                                    class="{% if request.GET.cat == cat.pk|stringformat:'i' %}text-dark{% endif %}">{{ cat.name }} {{ cat.products.count }}</a></li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseTwo">Branding</a>
+                                    </div>
+                                    <div id="collapseTwo" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__brand">
+                                                <ul>
+                                                    {%for brand in brands %}
+                                                    <li><a class="{% if request.GET.brand == brand.pk|stringformat:'i' %}text-dark{% endif %}" onclick="addUrlParameter('brand', {{ brand.pk }})">{{ brand.name }}</a></li>
+                                                    {% endfor %}
+
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseThree">Filter Price</a>
+                                    </div>
+                                    <div id="collapseThree" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__price">
+                                                <input type="text" class="js-range-slider" name="my_range" value="" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseFour">Size</a>
+                                    </div>
+                                    <div id="collapseFour" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__tags">
+                                                {% for size in sizes %}
+                                                <a onclick="addUrlParameter('size', {{ size.pk }})" style="cursor: pointer;" class="{% if request.GET.size == size.pk|stringformat:'i' %} bg_dark text-white {% endif %}">{{size.name}}</a>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseFive">Colors</a>
+                                    </div>
+                                    <div id="collapseFive" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__color">
+                                                {% for color in colors %}
+                                                <label style="background-color: {{ color.code }}" for="{{ color.code }}">
+                                                    <input onclick="addUrlParameter('color', {{ color.pk }})" type="radio" id="{{ color.code }}">
+                                                </label>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card">
+                                    <div class="card-heading">
+                                        <a data-toggle="collapse" data-target="#collapseSix">Tags</a>
+                                    </div>
+                                    <div id="collapseSix" class="collapse show" data-parent="#accordionExample">
+                                        <div class="card-body">
+                                            <div class="shop__sidebar__tags">
+                                                {% for tag in tags %}
+                                                <a onclick="addUrlParameter('tag', {{ tag.pk }})" style="cursor: pointer;" class="{% if request.GET.tag == tag.pk|stringformat:'i' %} bg_dark text-white {% endif %}">#{{tag.name}}</a>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+</div>
+
+
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
+<script>
+    function addUrlParameter(name, value){
+        let searchParameter = new URLSearchParams(window.location.search)
+        if(searchParameter.has(name) && searchParameter.get(name) == value){
+            searchParameter.delete(name)
+        }else {
+            searchParameter.set(name, value)
+        }
+
+        window.location.search = searchParameter.toString()
+    }
+    
+    $(".js-range-slider").ionRangeSlider({
+        type: "double",
+        min: {{ min_price }},
+        max: {{ max_price }},
+        from: 20,
+        to: 50,
+        grid: true,
+        prefix: "$"
+    });
+    
+</script>
+
+
+{% endblock %}
