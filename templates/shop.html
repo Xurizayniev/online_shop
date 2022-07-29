@@ -1,5 +1,6 @@
 {% extends 'layouts/base.html' %}
 {% load static %}
+{% load my_tags %}
 {% block extra_css %}
     <style>
         a:hover{
@@ -46,11 +47,11 @@
                             <div class="col-lg-6 col-md-6 col-sm-6">
                                 <div class="shop__product__option__right">
                                     <p>Sort by Price:</p>
-                                    <select onchange="addUrlParameter('Sort', this.value)">
+                                    <select onchange="addUrlParameter('sort', this.value)">
                                         <option value="">-----</option>
-                                        <option {% if request.GET.sort == 'price' %}selected{% endif %}value="Price">Low To High</option>
-                                        <option {% if request.GET.sort == '-price' %}selected{% endif %} value="Price">High to low</option>
-                                        <!-- <option value="sale">Sale</option> -->
+                                        <option {% if request.GET.sort == 'price' %} selected {% endif %} value="price">Low To High</option>
+                                        <option {% if request.GET.sort == '-price' %} selected {% endif %} value="-price">High to low</option>
+                                        <option {% if request.GET.sort == 'sale' %} selected {% endif %} value="sale">Sale</option>
                                     </select>
                                 </div>
                             </div>
@@ -105,10 +106,13 @@
         type: "double",
         min: 0,
         max: 1000,
-        from: 200,
-        to: 500,
+        from: 0,
+        to: 200,
         grid: true,
-        prefix: "$"
+        prefix: "$",
+        onFinish(data){
+            addUrlParameter('price', data.from.toString()) + ';' + data.to.toString()
+        }
     });
     
 </script>

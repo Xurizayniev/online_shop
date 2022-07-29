@@ -38,10 +38,15 @@ class ShopView(ListView):
         sort = self.request.GET.get('sort')
         if sort == 'price':
             qs = qs.order_by('price')
-        elif sort == '-price':
+        elif sort == '-Price':
             qs = qs.order_by('-price')
         elif sort == 'sale':
-            qs = qs
+            qs = qs.order_by('sale')
+        
+        price = self.request.GET.get('price')
+        if price:
+            min, max = price.split(';') # ['150', '325'] min >= real_price and max <= real_price
+            qs = qs.filter(real_price__gte=min, real_price__lte=max)
         return qs
 
     def get_context_data(self, **kwargs):
@@ -52,7 +57,7 @@ class ShopView(ListView):
         data['sizes'] = SizeModel.objects.all()
         data['brands'] = BrandModel.objects.all()
         data['colors'] = ColorModel.objects.all()
-        data['min_price'], data['max_price'] = ProductModel.objects.aggregate(Min('price'), Max('price')).values()
+        data['min_price'], data['max_price'] = ProductModel.objects.aggregate(Min('real_price'), Max('real_price')).values()
 
 
         return data
@@ -66,14 +71,3 @@ class ProductDetailView(DetailView):
         data = super().get_context_data(**kwargs)
         data['products'] = ProductModel.objects.all().exclude(id=self.object.pk)[:4]
         return data
-
-# class ProductDetailView(DetailView):
-#     model = ProductModel
-#     template_name = 'shop-details.html'
-#     context_object_name = "my_article"
-
-#     def get_context_data(self, **kwargs):
-#         data = super().get_context_data()
-#         data['products'] = ProductModel.objects.all().exclude(id=self.object.pk)[:4]
-
-

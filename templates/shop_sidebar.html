@@ -5,6 +5,7 @@
                             <form action="{% url 'shop:home' %}", method="GET">
                                 <input name="search" value="{{ request.GET.search }}" type="text" placeholder="Search...">
                                 <button type="submit"><span class="icon_search"></span></button>
+                                <a style="color: black" href="{%url 'shop:home' %}">Clear filter</a>
                             </form>
                         </div>
                         <div class="shop__sidebar__accordion">
@@ -106,12 +107,17 @@
 
 
 
+
+
+
+
 {% block extra_js %}
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
 <script>
     function addUrlParameter(name, value){
         let searchParameter = new URLSearchParams(window.location.search)
+        console.log('asfdasdasdsad')
         if(searchParameter.has(name) && searchParameter.get(name) == value){
             searchParameter.delete(name)
         }else {
@@ -123,12 +129,15 @@
     
     $(".js-range-slider").ionRangeSlider({
         type: "double",
-        min: {{ min_price }},
-        max: {{ max_price }},
-        from: 20,
-        to: 50,
+        min: 0,
+        max: 1000,
+        from: 0,
+        to: 200,
         grid: true,
-        prefix: "$"
+        prefix: "$",
+        onFinish(data){
+            addUrlParameter('price', data.from.toString()) + ';' + data.to.toString()
+        }
     });
     
 </script>
