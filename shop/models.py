@@ -3,6 +3,12 @@ from django.utils.translation import gettext_lazy as tr
 from django.utils import timezone
 from ckeditor_uploader.fields import RichTextUploadingField
 from decimal import *
+from django.contrib.auth import get_user_model
+from django.db import IntegrityError
+from django.db.models import Sum
+
+UserModel = get_user_model()
+
 class CategoryModel(models.Model):
     name = models.CharField(max_length=60, verbose_name=tr('name'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=tr('created_at'))
@@ -49,7 +55,7 @@ class ColorModel(models.Model):
 
 
 
-class productTagModel(models.Model):
+class ProductTagModel(models.Model):
     name = models.CharField(max_length=60, verbose_name=tr('name'))
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=tr('created_at'))
         
@@ -78,7 +84,7 @@ class ProductModel(models.Model):
         verbose_name=tr('category')
     )
     tags = models.ManyToManyField(
-        productTagModel, 
+        ProductTagModel, 
         related_name='Products', 
         verbose_name=tr('tags'),
     )
@@ -91,13 +97,11 @@ class ProductModel(models.Model):
         ColorModel, 
         related_name='Products', 
         verbose_name=tr('colors'),
-        null=True
     )
     brand = models.ForeignKey(
         BrandModel, on_delete=models.RESTRICT, 
         related_name='Products', 
         verbose_name=tr('brands'),
-        null=True
     )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name=tr('created_at'))
 
@@ -108,7 +112,22 @@ class ProductModel(models.Model):
 
     def new(self):
         return (timezone.now() - self.created_at).days <= 5
-    
+
+    @staticmethod
+    def get_cart_info(request):
+        cart = request.session.get('cart', [])
+        if not cart:
+            return 0, 0.0
+        return len(cart), ProductModel.objects.filter(id__in=cart).aggregate(Sum('real_price'))['real_price__sum']
+
+
+    @staticmethod
+    def get_cart_objects(request):
+        cart = request.session.get('cart', [])
+        if not cart:
+            return None
+        return ProductModel.objects.filter(id__in=cart)
+
     def __str__(self):
         return self.title
 
@@ -116,3 +135,25 @@ class ProductModel(models.Model):
     class Meta:
         verbose_name = 'product'
         verbose_name_plural = 'products'
+
+
+class WishlistModel(models.Model):
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='wishlists', verbose_name=tr('user'))
+    product = models.ForeignKey(ProductModel, on_delete=models.CASCADE, verbose_name=tr('product'))
+
+    @staticmethod
+    def create_or_delete(user, product):
+        try:
+            return WishlistModel.objects.create(user=user, product=product)
+        except IntegrityError:
+            return WishlistModel.objects.get(user=user, product=product).delete()
+
+    def __str__(self):
+        return f"{self.user.get_full_name()} | {self.product.title}"
+
+    class Meta:
+        verbose_name = 'wishlist'
+        verbose_name_plural = 'wishlists'
+        unique_together = 'user', 'product',
+
+

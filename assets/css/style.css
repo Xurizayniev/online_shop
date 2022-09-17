@@ -3862,3 +3862,8 @@ ol {
 		height: 250px;
 	}
 }
+
+.my_lang:hover {
+	background: #0d0d0d !important;
+	color: white !important;
+}

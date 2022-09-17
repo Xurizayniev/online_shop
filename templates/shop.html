@@ -87,35 +87,6 @@
 
 {% endblock %}
 {% block extra_js %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/ion-rangeslider/2.3.1/js/ion.rangeSlider.min.js"></script>
-<script>
-    function addUrlParameter(name, value){
-        let searchParameter = new URLSearchParams(window.location.search)
-        console.log('asfdasdasdsad')
-        if(searchParameter.has(name) && searchParameter.get(name) == value){
-            searchParameter.delete(name)
-        }else {
-            searchParameter.set(name, value)
-        }
-
-        window.location.search = searchParameter.toString()
-    }
-    
-    $(".js-range-slider").ionRangeSlider({
-        type: "double",
-        min: 0,
-        max: 1000,
-        from: 0,
-        to: 200,
-        grid: true,
-        prefix: "$",
-        onFinish(data){
-            addUrlParameter('price', data.from.toString()) + ';' + data.to.toString()
-        }
-    });
-    
-</script>
 
 
 {% endblock %}

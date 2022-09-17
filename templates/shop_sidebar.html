@@ -1,12 +1,14 @@
 {% load static %}
+{% load my_tags %}
 
 <div class="shop__sidebar">
                        <div class="shop__sidebar__search">
                             <form action="{% url 'shop:home' %}", method="GET">
                                 <input name="search" value="{{ request.GET.search }}" type="text" placeholder="Search...">
                                 <button type="submit"><span class="icon_search"></span></button>
-                                <a style="color: black" href="{%url 'shop:home' %}">Clear filter</a>
+                                
                             </form>
+                            <a style="color: black" href="{%url 'shop:home' %}">Clear filter</a>
                         </div>
                         <div class="shop__sidebar__accordion">
                             <div class="accordion" id="accordionExample">
@@ -129,14 +131,14 @@
     
     $(".js-range-slider").ionRangeSlider({
         type: "double",
-        min: 0,
-        max: 1000,
-        from: 0,
-        to: 200,
+        min: {{ min_price }},
+        max: {{ max_price }},
+        from: {% get_current_price request 0 %},
+        to: {% get_current_price request 1 %},
         grid: true,
         prefix: "$",
         onFinish(data){
-            addUrlParameter('price', data.from.toString()) + ';' + data.to.toString()
+            addUrlParameter('price', data.from.toString() + ";" + data.to.toString())
         }
     });
     
