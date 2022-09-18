@@ -1,6 +1,3 @@
-from itertools import product
-import profile
-from sre_constants import AT_END_STRING
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.views.generic import *
@@ -16,11 +13,13 @@ class CheckoutView(CreateView):
     form_class = CheckoutForm
     success_url = 'order/history/'
 
-    # def dispatch(self, request, *args, **kwargs):
-    #     if len(request.session['cart', []]) == 0:
-    #         return redirect(render('pages:home'))
+    def dispatch(self, request, *args, **kwargs):
+        if len(request.session.get('cart', [])) == 0:
+            return redirect(reverse('pages:home'))
+        return super(CheckoutView, self).dispatch(request, *args, **kwargs)
 
-    #     return super(CheckoutView, self).dispatch(request, *args, **kwargs)
+    def get_success_url(self):
+        return reverse('orders:history')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
@@ -36,10 +35,9 @@ class CheckoutView(CreateView):
         total_price = products.aggregate(Sum('real_price')).get('real_price__sum', '')
         
         order = form.save(commit=True)
-        
-
+    
         if self.request.user.is_authenticated:
-            order.user = self.request.user.id
+            order.user_id = self.request.user.id
         order.total_price = total_price
         order.products.set(products)
         order.save()
@@ -51,7 +49,5 @@ class CheckoutView(CreateView):
 class OrderHistoryView(ListView):
     template_name = 'order_history.html'
 
-
-    def get_queryset(self):
-        
+    def get_queryset(self):        
         return OrderHistoryModel.objects.filter(user=self.request.user.id)

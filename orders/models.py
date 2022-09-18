@@ -9,7 +9,7 @@ class OrderHistoryModel(models.Model):
     products = models.ManyToManyField(ProductModel)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    country = models.CharField(max_length=125)
+    country = models.CharField(max_length=50)
     address1 = models.TextField(max_length=255)
     address2 = models.TextField(max_length=255, null=True, blank=True)
     phone = models.CharField(max_length=12)

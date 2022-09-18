@@ -18,13 +18,7 @@ class ProfileView(UpdateView):
     def get_object(self, queryset=None):
         profile, created = ProfileModel.objects.get_or_create(user=self.request.user)
         return profile
-    
-# def Profile(request):
-#     form = ProfileForm()
 
-#     return render(request, 'profile.html', context={
-#         'form': form
-#     })
 
 def logout_view(request):
     logout(request)
